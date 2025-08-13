@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QD Json Form Builder
+
+Build simple forms from a JSON configuration. Type your JSON on the "Config" tab and preview the generated form on the "Result" tab.
+
+## Tech Stack
+- Next.js 15 (React 19)
+- TypeScript
+- TailwindCSS 4
+- Vitest + Testing Library (unit tests)
+- Playwright (e2e tests)
 
 ## Getting Started
+1. Install dependencies:
+   - npm install
+2. Run the dev server:
+   - npm run dev
+3. Open the app:
+   - http://localhost:3000
 
-First, run the development server:
+You can edit the default example in src/app/page.tsx or paste your own JSON in the "Config" tab of the app.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Useful Scripts
+- dev: Start development server
+- test: Run unit tests with Vitest
+- e2e: Run Playwright end-to-end tests
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## JSON Schema
+The application expects a JSON object with the following structure.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Top-level object (FormConfig):
+- title: string
+- fields: FieldConfig[]
+- buttons: ButtonConfig[]
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+FieldConfig:
+- name: string (unique across all fields)
+- label: string
+- type: "numeric" | "string" | "multi-line" | "boolean" | "date" | "enum"
+- options?: string[] (required only when type === "enum")
 
-## Learn More
+ButtonConfig:
+- text: string
+- variant?: "primary" | "secondary" | "text"
 
-To learn more about Next.js, take a look at the following resources:
+### Validation Rules
+- JSON must be syntactically valid.
+- fields must be a non-empty array of objects.
+- Each field must have a non-empty name and label.
+- type must be one of: numeric, string, multi-line, boolean, date, enum.
+- For enum fields, options must be a non-empty array of strings.
+- Field names must be unique (duplicates are reported).
+- buttons must be an array of objects.
+- Each button must have non-empty text.
+- variant, if provided, must be one of: primary, secondary, text.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Example
+{
+  "title": "User Registration",
+  "fields": [
+    { "name": "username", "label": "Username", "type": "string" },
+    { "name": "age", "label": "Age", "type": "numeric" },
+    { "name": "bio", "label": "Biography", "type": "multi-line" },
+    { "name": "subscribe", "label": "Subscribe", "type": "boolean" },
+    { "name": "birthdate", "label": "Birth Date", "type": "date" },
+    { "name": "gender", "label": "Gender", "type": "enum", "options": ["Male", "Female", "Other"] }
+  ],
+  "buttons": [
+    { "text": "Cancel", "variant": "text" },
+    { "text": "Save", "variant": "primary" }
+  ]
+}
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- The UI validates your JSON and shows a list of issues if any are found.
+- The preview renders input components corresponding to each field type.
+- This project is meant for demo and exploration; it does not persist data or submit forms.
